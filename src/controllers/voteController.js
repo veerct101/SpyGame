@@ -14,7 +14,10 @@ const submitVote = async (req, res) => {
     }
 
     // Ensure voter is alive
-    const voterRecord = game.players.find(p => p.user.toString() === voterId);
+    const voterRecord = game.players.find(p => {
+      const pid = p.user._id ? p.user._id.toString() : p.user.toString();
+      return pid === voterId;
+    });
     if (!voterRecord || !voterRecord.isAlive) {
       return res.status(403).json({ message: 'Only alive players can vote' });
     }

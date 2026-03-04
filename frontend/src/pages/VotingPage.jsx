@@ -28,7 +28,7 @@ const VotingPage = () => {
   };
 
   const alivePlayers = players.filter(p => p.isAlive);
-  const myId = localStorage.getItem('userId');
+  const myId = sessionStorage.getItem('userId');
 
   return (
     <div className="card vote-card">
@@ -38,14 +38,15 @@ const VotingPage = () => {
       
       <div className="players-grid">
         {alivePlayers.map(p => {
-          const uId = p.user._id || p.user;
+          const uId = typeof p.user === 'object' ? p.user._id : p.user;
+          const displayName = p.name || (typeof p.username === 'object' ? p.username.username : (p.username || uId));
           return (
             <div 
               key={uId} 
               className={`player-select ${selectedTarget === uId ? 'selected' : ''}`}
               onClick={() => setSelectedTarget(uId)}
             >
-              {p.user.username || p.user}
+              {displayName}
             </div>
           );
         })}

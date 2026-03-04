@@ -42,8 +42,8 @@ const PlayerDashboard = () => {
     );
   }
 
-  const me = status.players?.find(p => p.user._id === localStorage.getItem('userId')) 
-             || status.players?.find(p => p.user === localStorage.getItem('userId'))
+  const meUserId = sessionStorage.getItem('userId');
+  const me = status.players?.find(p => p.user === meUserId) 
              || { points: 0, isAlive: false };
 
   return (
@@ -67,9 +67,11 @@ const PlayerDashboard = () => {
       <div className="players-list shadow-box">
         <h3>Alive Players</h3>
         <ul>
-          {status.players?.filter(p => p.isAlive).map(p => (
-            <li key={p.user._id || p.user}>{p.user.username || p.user}</li>
-          ))}
+          {status.players?.filter(p => p.isAlive).map(p => {
+            const displayId = typeof p.user === 'object' ? p.user._id : p.user;
+            const displayName = p.name || (typeof p.username === 'object' ? p.username.username : (p.username || displayId));
+            return <li key={displayId}>{displayName}</li>;
+          })}
         </ul>
       </div>
 

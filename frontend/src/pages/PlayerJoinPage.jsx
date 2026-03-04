@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
 
 const PlayerJoinPage = () => {
+  const [playerId, setPlayerId] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState('');
   const [error, setError] = useState('');
@@ -10,7 +11,7 @@ const PlayerJoinPage = () => {
 
   const handleJoin = async (e) => {
     e.preventDefault();
-    if (!playerName || !gameId) {
+    if (!playerId || !playerName || !gameId) {
       setError('Please fill all fields');
       return;
     }
@@ -18,13 +19,14 @@ const PlayerJoinPage = () => {
     
     try {
       try {
-        await authAPI.register({ username: playerName, password: 'password', role: 'Player' });
+        await authAPI.register({ username: playerId, name: playerName, password: 'password', role: 'Player' });
       } catch (err) {}
       
-      const userRes = await authAPI.login({ username: playerName, password: 'password' });
-      localStorage.setItem('token', userRes.data.token);
-      localStorage.setItem('userId', userRes.data.user.id);
-      localStorage.setItem('username', userRes.data.user.username);
+      const userRes = await authAPI.login({ username: playerId, password: 'password' });
+      sessionStorage.setItem('token', userRes.data.token);
+      sessionStorage.setItem('userId', userRes.data.user.id);
+      sessionStorage.setItem('username', userRes.data.user.username);
+      sessionStorage.setItem('name', userRes.data.user.name);
       
       navigate(`/game/${gameId}`);
     } catch (err) {
@@ -38,12 +40,21 @@ const PlayerJoinPage = () => {
       {error && <div className="error">{error}</div>}
       <form onSubmit={handleJoin}>
         <div className="form-group">
-          <label>Player Name:</label>
+          <label>Player ID (Login ID):</label>
+          <input 
+            type="text" 
+            value={playerId} 
+            onChange={e => setPlayerId(e.target.value)} 
+            placeholder="E.g. player1"
+          />
+        </div>
+        <div className="form-group">
+          <label>Display Name:</label>
           <input 
             type="text" 
             value={playerName} 
             onChange={e => setPlayerName(e.target.value)} 
-            placeholder="Enter your name"
+            placeholder="E.g. Rahul"
           />
         </div>
         <div className="form-group">

@@ -122,7 +122,7 @@ const AdminDashboard = () => {
                      onChange={() => toggleUser(u._id)} 
                      style={{ marginRight: '10px' }}
                    />
-                   <label htmlFor={u._id} style={{ marginBottom: 0, cursor: 'pointer', lineHeight: '1.2' }}>{u.username}</label>
+                   <label htmlFor={u._id} style={{ marginBottom: 0, cursor: 'pointer', lineHeight: '1.2' }}>{u.name ? `${u.name} (${u.username})` : u.username}</label>
                  </div>
                ))}
                {users.filter(u => u.role !== 'Admin').length === 0 && <p style={{ fontSize: '0.8rem', color: '#ccc' }}>No registered players found. Open another tab and join as players.</p>}
@@ -157,7 +157,7 @@ const AdminDashboard = () => {
                <ul style={{ listStyle: 'none', padding: 0, marginTop: '10px' }}>
                  {gameStatus.players?.map(p => (
                    <li key={p.user._id || p.user} style={{ padding: '0.75rem 0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                     <div><strong>{p.user.username || p.user}</strong> - <span style={{color: p.role === 'Spy' ? '#ef4444' : '#3b82f6'}}>{p.role}</span></div>
+                     <div><strong>{p.user.name ? `${p.user.name} (${p.user.username})` : (p.user.username || p.user)}</strong> - <span style={{color: p.role === 'Spy' ? '#ef4444' : '#3b82f6'}}>{p.role}</span></div>
                      <div style={{ fontSize: '0.9rem', color: '#ccc', marginTop: '3px' }}>Word: {p.assignedWord} | Status: {p.isAlive ? <span style={{color:'#10b981'}}>Alive</span> : <span style={{color:'#fca5a5'}}>Eliminated</span>} | Pts: {p.points}</div>
                    </li>
                  ))}

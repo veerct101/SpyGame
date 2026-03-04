@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const register = async (req, res) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, name, password, role } = req.body;
     
     // Check if user exists
     const existingUser = await User.findOne({ username });
@@ -17,12 +17,13 @@ const register = async (req, res) => {
     // Create user
     const newUser = new User({
       username,
+      name,
       passwordHash,
       role: role || 'Player'
     });
     await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully', user: { id: newUser._id, username: newUser.username, role: newUser.role } });
+    res.status(201).json({ message: 'User created successfully', user: { id: newUser._id, username: newUser.username, name: newUser.name, role: newUser.role } });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -47,7 +48,7 @@ const login = async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    res.json({ token, user: { id: user._id, username: user.username, role: user.role } });
+    res.json({ token, user: { id: user._id, username: user.username, name: user.name, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -55,7 +56,7 @@ const login = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}, 'username _id role');
+    const users = await User.find({}, 'username name _id role');
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });

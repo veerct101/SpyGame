@@ -54,7 +54,10 @@ const getAssignedWord = async (req, res) => {
       return res.status(400).json({ message: 'Game is not active' });
     }
 
-    const playerRecord = game.players.find(p => p.user.toString() === req.user.id);
+    const playerRecord = game.players.find(p => {
+      const pid = p.user._id ? p.user._id.toString() : p.user.toString();
+      return pid === req.user.id;
+    });
     
     if (!playerRecord) {
       return res.status(403).json({ message: 'You are not a player in this game' });
@@ -73,7 +76,7 @@ const getAssignedWord = async (req, res) => {
 // Public status route
 const getGameStatus = async (req, res) => {
   try {
-    const game = await Game.findById(req.params.gameId).populate('players.user', 'username').populate('history.eliminatedPlayer', 'username');
+    const game = await Game.findById(req.params.gameId).populate('players.user', 'username name').populate('history.eliminatedPlayer', 'username name');
     if (!game) return res.status(404).json({ message: 'Game not found' });
     
     // We only send back public status. We DO NOT expose words or roles unless in history.
@@ -84,7 +87,9 @@ const getGameStatus = async (req, res) => {
       winner: game.winner,
       history: game.history,
       players: game.players.map(p => ({
-        user: p.user,
+        user: p.user._id ? p.user._id.toString() : p.user.toString(),
+        username: p.user.username,
+        name: p.user.name,
         isAlive: p.isAlive,
         points: p.points
       }))
@@ -98,7 +103,7 @@ const getGameStatus = async (req, res) => {
 
 const getAdminGameStatus = async (req, res) => {
   try {
-    const game = await Game.findById(req.params.gameId).populate('players.user', 'username');
+    const game = await Game.findById(req.params.gameId).populate('players.user', 'username name');
     if (!game) return res.status(404).json({ message: 'Game not found' });
     if (game.admin.toString() !== req.user.id) return res.status(403).json({ message: 'Only admin can view this' });
     res.json(game);
